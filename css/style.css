@@ -1,0 +1,173 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #131b21;
+  --gold-soft: #e9d5a8;
+}
+
+html, body { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: #fff;
+  font-family: "Playfair Display", Georgia, serif;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.card {
+  width: min(88vw, 340px);
+  padding: 32px 26px 28px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(245, 201, 106, 0.18);
+  border-radius: 22px;
+  box-shadow: 0 0 60px rgba(245, 160, 90, 0.08);
+  backdrop-filter: blur(6px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.card.hide { opacity: 0; transform: scale(0.94); pointer-events: none; }
+.card__icon { font-size: 30px; margin-bottom: 10px; }
+.card__title { font-size: 24px; font-style: italic; font-weight: 700; margin-bottom: 22px; }
+
+.bar { height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; }
+.bar__fill {
+  width: 0; height: 100%;
+  background: linear-gradient(90deg, #ffe9a8, #f0b64e);
+  transition: width 0.25s linear;
+}
+.card__status {
+  margin: 12px 0 22px;
+  font: 11px/1.4 "Courier New", monospace;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: 0;
+  border-radius: 10px;
+  font: 700 12px "Courier New", monospace;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: #1a1305;
+  background: linear-gradient(180deg, #ffe08a, #e0ac3c);
+  box-shadow: 0 0 24px rgba(245, 190, 90, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 34px rgba(245, 190, 90, 0.55); }
+.btn:disabled {
+  cursor: not-allowed;
+  color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: none;
+}
+
+.scene {
+  position: fixed; inset: 0;
+  display: grid; place-items: center;
+  opacity: 0; visibility: hidden;
+  transition: opacity 1s ease;
+}
+.scene.show { opacity: 1; visibility: visible; }
+
+.stage { position: relative; width: min(100vw, 960px); }
+svg#flower-frame { width: 100%; height: auto; max-height: 84vh; display: block; overflow: visible; }
+
+.halo {
+  position: absolute; left: 50%; top: 68%;
+  width: 85%; aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 140, 200, 0.32), rgba(150, 110, 255, 0.12) 45%, transparent 70%);
+  opacity: 0;
+  transition: opacity 3s ease;
+}
+.bloom .halo { opacity: 1; animation: pulse 4s ease-in-out infinite 3s; }
+
+#vines {
+  filter: drop-shadow(0 0 2px #fff3c4) drop-shadow(0 0 9px rgba(255, 160, 50, 0.9));
+  transition: opacity 5s ease 1s;
+}
+.bloom #vines { opacity: 0.55; }
+
+.vine {
+  fill: none;
+  stroke: #ffe3a3;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.go .vine {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset var(--t) cubic-bezier(.33, .66, .66, 1) var(--d);
+}
+.thorn { fill: none; stroke: #fff0c4; stroke-linecap: round; opacity: 0; }
+.tip { fill: #fff; opacity: 0; }
+.go .thorn, .go .tip { opacity: 1; transition: opacity 0.4s ease var(--d); }
+
+.stem {
+  fill: none; stroke: #e7b98f; stroke-width: 6; stroke-linecap: round;
+  filter: drop-shadow(0 0 5px rgba(255, 190, 150, 0.7));
+  opacity: 0; transition: opacity 1.5s ease;
+}
+.bud .stem { opacity: 1; }
+
+.rise { transform: translateY(150px); opacity: 0; transition: transform 2.4s ease, opacity 1.2s ease; }
+.bud .rise { transform: none; opacity: 1; }
+.breath { animation: breathe 5s ease-in-out infinite 8s; }
+.core { opacity: 0; transition: opacity 3s ease 2s; }
+.bloom .core { opacity: 1; }
+
+#lotus { filter: drop-shadow(0 0 7px rgba(255, 150, 210, 0.8)); }
+
+.petal {
+  transform: rotate(calc(var(--a) * 0.07)) scale(calc(var(--s) * 0.38));
+  transition: transform 3s cubic-bezier(.22, .9, .28, 1) var(--d);
+}
+.petal path { stroke: rgba(255, 255, 255, 0.9); stroke-width: 1.2; }
+.petal .vein { fill: none; stroke: rgba(255, 255, 255, 0.4); stroke-width: 1; }
+.petal .iri { stroke: none; mix-blend-mode: screen; opacity: 0.6; }
+.petal circle { fill: #fff; }
+.bloom .petal { transform: rotate(var(--a)) scale(var(--s)); }
+
+.stamen {
+  transform: rotate(var(--a)) scale(0);
+  transition: transform 1.8s ease var(--d);
+}
+.stamen path { fill: none; stroke: #ffd36b; stroke-width: 1.2; }
+.stamen circle { fill: #fff2b8; }
+.bloom .stamen { transform: rotate(var(--a)) scale(var(--s)); }
+
+.front { transform: scale(0.15); transition: transform 2.6s ease 1.8s; }
+.front ellipse { fill: url(#gPink); stroke: rgba(255, 255, 255, 0.9); stroke-width: 1.2; }
+.bloom .front { transform: scale(1); }
+
+.text {
+  position: absolute; left: 0; right: 0; text-align: center;
+  font-style: italic; letter-spacing: 0.08em; color: var(--gold-soft);
+  text-shadow: 0 0 14px rgba(245, 201, 106, 0.45);
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 2s ease, transform 2s ease;
+}
+.text--top { top: 9vh; font-size: clamp(22px, 5vw, 34px); }
+.text--bottom { bottom: 7vh; font-size: clamp(16px, 3.6vw, 24px); padding: 0 20px; }
+.text--bottom span { display: block; margin-top: 6px; font-size: 18px; }
+.scene.done .text { opacity: 1; transform: none; }
+.scene.done .text--bottom { transition-delay: 1s; }
+
+#sparkles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.spark {
+  position: absolute; border-radius: 50%;
+  background: var(--c); box-shadow: 0 0 8px var(--c);
+  opacity: 0; animation: float var(--t) linear infinite var(--dl);
+}
+
+@keyframes float {
+  0% { opacity: 0; transform: translateY(0) scale(0.6); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-140px) translateX(var(--x)) scale(1); }
+}
+@keyframes breathe { 50% { transform: scale(1.02); } }
+@keyframes pulse { 50% { opacity: 0.65; } }
